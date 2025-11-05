@@ -18,6 +18,7 @@ export default defineConfig(({ mode }) => {
     build: {
       outDir: 'dist',
       sourcemap: false,
+      minify: 'esbuild',
       rollupOptions: {
         output: {
           manualChunks: {
@@ -27,7 +28,9 @@ export default defineConfig(({ mode }) => {
         }
       }
     },
-    // Use environment variables in client
+    // Base path for Vercel
+    base: './',
+    // Define environment variables
     define: {
       'import.meta.env.VITE_API_URL': JSON.stringify(env.VITE_API_URL),
       'import.meta.env.VITE_NODE_ENV': JSON.stringify(env.VITE_NODE_ENV)
