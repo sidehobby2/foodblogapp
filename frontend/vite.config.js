@@ -17,21 +17,21 @@ export default defineConfig(({ mode }) => {
       outDir: 'dist',
       sourcemap: false,
       minify: 'esbuild',
+      // Add explicit public path
+      assetsDir: 'assets',
       rollupOptions: {
         output: {
-          // Ensure proper chunk naming
           chunkFileNames: 'assets/[name]-[hash].js',
           entryFileNames: 'assets/[name]-[hash].js',
           assetFileNames: 'assets/[name]-[hash].[ext]'
         }
       }
     },
-    // Remove base path for Vercel
-    base: '/',
-    // Define environment variables properly
+
+    base: '',
     define: {
-      'process.env.VITE_API_URL': JSON.stringify(env.VITE_API_URL),
-      'process.env.VITE_NODE_ENV': JSON.stringify(env.VITE_NODE_ENV)
+      'import.meta.env.VITE_API_URL': JSON.stringify(env.VITE_API_URL),
+      'import.meta.env.VITE_NODE_ENV': JSON.stringify(env.VITE_NODE_ENV)
     }
   }
 })
