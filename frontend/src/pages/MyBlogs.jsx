@@ -1,0 +1,113 @@
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { Plus, ChefHat } from "lucide-react";
+import api from "../utils/api"; // Changed from axios to api
+import BlogCard from "../components/BlogCard";
+import { useAuth } from "../context/AuthContext";
+
+const MyBlogs = () => {
+  const [blogs, setBlogs] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      fetchMyBlogs();
+    }
+  }, [user]);
+
+  const fetchMyBlogs = async () => {
+    try {
+      const response = await api.get("/api/blogs/my-blogs"); // Changed to api
+      setBlogs(response.data.data);
+    } catch (error) {
+      console.error("Error fetching my blogs:", error);
+      alert("Failed to load your recipes");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDelete = async (blogId) => {
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this recipe? This action cannot be undone."
+      )
+    ) {
+      return;
+    }
+
+    try {
+      await api.delete(`/api/blogs/${blogId}`); // Changed to api
+      setBlogs(blogs.filter((blog) => blog._id !== blogId));
+    } catch (error) {
+      console.error("Error deleting blog:", error);
+      alert("Failed to delete recipe");
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-6xl mx-auto text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading your recipes...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto px-4 py-8" dir="ltr">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+          <div>
+            <h1 className="text-4xl font-bold text-gray-900 mb-2 font-serif">
+              My Recipes
+            </h1>
+            <p className="text-gray-600">Manage your delicious recipes</p>
+          </div>
+          <Link
+            to="/create"
+            className="bg-orange-600 text-white px-6 py-3 rounded-xl hover:bg-orange-700 transition duration-200 flex items-center space-x-2 mt-4 md:mt-0 font-medium"
+          >
+            <Plus size={20} />
+            <span>New Recipe</span>
+          </Link>
+        </div>
+
+        {/* Blog Grid */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {blogs.map((blog) => (
+            <BlogCard key={blog._id} blog={blog} onDelete={handleDelete} />
+          ))}
+        </div>
+
+        {/* Empty State */}
+        {blogs.length === 0 && (
+          <div className="text-center py-16">
+            <div className="bg-gray-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
+              <ChefHat className="text-gray-400" size={32} />
+            </div>
+            <h3 className="text-2xl font-semibold text-gray-800 mb-3 font-serif">
+              No recipes yet
+            </h3>
+            <p className="text-gray-600 mb-8 max-w-md mx-auto">
+              Start sharing your delicious recipes with the community!
+            </p>
+            <Link
+              to="/create"
+              className="bg-orange-600 text-white px-8 py-3 rounded-xl hover:bg-orange-700 transition duration-200 inline-flex items-center space-x-2 font-medium"
+            >
+              <Plus size={20} />
+              <span>Create Your First Recipe</span>
+            </Link>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default MyBlogs;
