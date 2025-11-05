@@ -15,7 +15,7 @@ const app = express();
 // CORS configuration for production
 const allowedOrigins = [
     'http://localhost:3000',
-    'https://your-frontend-app.vercel.app', // Will update after deployment
+    'https://foodblogapp.vercel.app', // Will update after deployment
     process.env.CLIENT_URL
 ].filter(Boolean);
 
